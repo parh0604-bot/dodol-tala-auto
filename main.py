@@ -93,8 +93,7 @@ def wordpress_check(url):
 
 
 
-def find_info( url ):
-    
+def find_info(url):
     EMAIL_REGEX = re.compile(
         r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
     )
@@ -106,15 +105,14 @@ def find_info( url ):
     )
 
     contacts = {"emails": set(), "phones": set(), "tel_links": set(), "mailto_links": set()}
-    
+
     try:
         contact_url = urljoin(url, "/contact-us/")
-        response = requests.get(contact_url, headers=headers, timeout=20)
+        response = requests.get(contact_url, headers=header, timeout=20)  # ← اصلاح شد
 
         if response.status_code != 200:
-
             for path in ["/contact/", "/contact-us", "/تماس-با-ما/", "/about-us/"]:
-                r = requests.get(urljoin(url, path), headers=headers, timeout=20)
+                r = requests.get(urljoin(url, path), headers=header, timeout=20)  # ← اصلاح شد
                 if r.status_code == 200:
                     response = r
                     contact_url = urljoin(url, path)
@@ -132,7 +130,7 @@ def find_info( url ):
                 contacts["tel_links"].add(href[4:])
 
         contacts["emails"].update(EMAIL_REGEX.findall(text))
-        contacts["emails"].update(EMAIL_REGEX.findall(html))  
+        contacts["emails"].update(EMAIL_REGEX.findall(html))
 
         contacts["emails"] = {
             e for e in contacts["emails"]
@@ -156,8 +154,6 @@ def find_info( url ):
 
     except requests.RequestException as e:
         return {"url": url, "error": str(e)}
-
-
 
 
 
